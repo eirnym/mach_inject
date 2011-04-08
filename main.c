@@ -4,13 +4,15 @@
 #include <sys/types.h>
 
 int main(int argc, char **argv) {
-
+/*
     FILE* pfd = NULL;
     char dso_path[128];
     char buf[128];
     char *process_name;
     pid_t pid;
     char cmd[128];
+
+    inject_dso(atoi(argv[1]), argv[2]);
 
     process_name = argv[1];
     sprintf(cmd, "ps -ef | grep \"%s\" | awk '{print $3}' | head -n 1",
@@ -39,5 +41,6 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    exit(EXIT_SUCCESS);
+    */
+    return EXIT_SUCCESS;
 }
