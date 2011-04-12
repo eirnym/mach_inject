@@ -93,9 +93,9 @@ int inject_dso(size_t libsystem_start, size_t dlopen_offset, pid_t pid,
      * offset. */
     vm_address_t offset = remote_code_addr + 21 + dlopen_offset;
     remote_code[17] = offset << 24 >> 24;
-    remote_code[18] = offset << 16 >> 16;
-    remote_code[19] = offset >> 16 << 16;
-    remote_code[20] = offset >> 24 << 24;
+    remote_code[18] = offset << 16 >> 24;
+    remote_code[19] = offset >> 8 << 24;
+    remote_code[20] = offset >> 24;
 
     /* set relative pointer to dlopen path string to %rdi */
     //...//
