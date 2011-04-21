@@ -68,13 +68,14 @@ int inject_dso(size_t libsystem_start, size_t dlopen_offset, pid_t pid,
     vm_protect(task, remote_stack_addr, remote_stack_size, 0, VM_PROT_WRITE |
         VM_PROT_READ);
 
-    remote_stack_contents = 0x0000DEADBEA7DAD; /* return address. */
-    size_t rsp;
+    remote_stack_contents = 0x0000DEADBEA7DAD; /* Invalid return address. */
+    size_t rsp; /* Use better 64 bit type for registers / pointers. */
     rsp = (size_t)remote_stack_addr + (remote_stack_size / 2);
     vm_write(task, rsp, (pointer_t)remote_stack_contents, remote_stack_size);
 
-    /* Set the thread state to be set up to call dlopen in the remote
-     * process. Integer and pointer arguments passed in %rdi and %rsi.  */
+    /* Set the thread state to call dlopen in the remote process. Integer and
+     * pointer arguments passed in %rdi and %rsi. Set the instruction pointer to
+     * the absolute address (in %rcx) to the VM address of dlopen. */
     regs.__rsp = (size_t)rsp;
     regs.__rdi = (size_t)remote_dlopen_str_addr;
     regs.__rsi = (size_t)RTLD_LAZY;
@@ -83,6 +84,9 @@ int inject_dso(size_t libsystem_start, size_t dlopen_offset, pid_t pid,
     /* Start the remote thread */
     thread_create_running(task, x86_THREAD_STATE64, (thread_state_t) &regs,
         x86_THREAD_STATE64_COUNT, &remote_thread);
+
+    /* Find out how to recover successfully from the segfault without OSX's
+     * useless ptrace... */
 
     return 0;
 }
